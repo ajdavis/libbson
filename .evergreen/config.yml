@@ -320,6 +320,15 @@ tasks:
                  fi
                done
 
+               # Check that all C files were included.
+               TAR_CFILES=`tar --wildcards -tf libbson-*.tar.gz 'libbson-*/src/bson/*.c' | cut -d / -f 4 | sort`
+               SRC_CFILES=`echo src/bson/*.c | xargs -n 1 | cut -d / -f 3 | sort`
+               if [ "$TAR_CFILES" != "$SRC_CFILES" ]; then
+                 echo "Not all C files are in the release archive"
+                 echo $TAR_CFILES > tar_cfiles.txt
+                 echo $SRC_CFILES | diff -y - tar_cfiles.txt
+               fi
+
                set +o xtrace
 
                end=$(date +%s)
